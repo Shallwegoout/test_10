@@ -1,0 +1,27 @@
+import requests
+import base64
+
+def get_block_transactions(block_number):
+    url = f"https://chains.cosmos.directory/akash/blocks/{block_number}"
+    
+    response = requests.get(url)
+    if response.status_code == 200:
+        data = response.json()
+        txs_base64 = data.get("data", {}).get("txs", "")
+        
+        decoded_txs = []
+        for tx_base64 in txs_base64:
+            decoded_tx = base64.b64decode(tx_base64).decode("utf-8")
+            decoded_txs.append(decoded_tx)
+        
+        return decoded_txs
+    else:
+        print("Error fetching block data:", response.text)
+        return None
+
+block_number = 11260637
+transactions = get_block_transactions(block_number)
+
+if transactions:
+    for i, tx in enumerate(transactions, start=1):
+        print(f"Transaction {i}:\n{tx}\n")
